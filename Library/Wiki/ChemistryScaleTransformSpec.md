@@ -1,6 +1,15 @@
-# 🧪 Chemistry ScaleTransform Specification
+# 🧪 Chemistry ScaleTransform & Molecular Bonding Homomorphism Specification
 
-Documents and verifies the open `ScaleTransform` typeclass properties for Chemical Elements mapped to Atomic Numbers ($Z$).
+Documents and verifies Atomic-to-Molecular scale transformations ($T_2, T_3$), atomic number ($Z$) homomorphisms, Watson-Crick base pairing hydrogen bonding laws ($A-T = 2, G-C = 3$), and molecular distinctness under Sandy Maguire's Homomorphic Observation framework using QuickCheck property testing.
+
+## 1. Mathematical Foundation & Chemical Homomorphisms
+
+Chemical synthesis maps atomic multisets into molecular compounds via structure-preserving scale transforms $\mathbf{T}_{\text{chem}} : \mathbf{ScaleLevel}_3 \to \mathbf{ScaleLevel}_4$:
+
+1. **Atomic Number Positivity**: $Z(\text{Element}) > 0$
+2. **Atomic Scale Homomorphism**: $\text{scaleTransform}(\text{Element}) \equiv \text{atomicNumber}(\text{Element})$
+3. **Element Distinctness Homomorphism**: $e_1 = e_2 \iff Z(e_1) = Z(e_2)$
+4. **Watson-Crick Hydrogen Bonding Homomorphism**: $\mathbf{H}(\text{BasePair}) \equiv 2 \cdot [A-T] + 3 \cdot [G-C]$
 
 ```idris
 module Wiki.ChemistryScaleTransformSpec
@@ -12,14 +21,14 @@ import Wiki.Generators
 
 %default total
 
-||| Property 1: Element ScaleTransform Atomic Number Positivity (Z > 0)
+||| 1. Element ScaleTransform Atomic Number Positivity (Z > 0)
 public export
 prop_elementAtomicNumberPositivity : Element -> Bool
 prop_elementAtomicNumberPositivity el =
   let z : Nat = scaleTransform el
   in z > 0
 
-||| Property 2: ScaleTransform Match with atomicNumber Function
+||| 2. ScaleTransform Match with atomicNumber Function
 public export
 prop_elementScaleTransformMatch : Element -> Bool
 prop_elementScaleTransformMatch el =
@@ -28,7 +37,7 @@ prop_elementScaleTransformMatch el =
       iEmp : Integer = cast {from=Nat} (atomicNumber el)
   in iZ == iEmp
 
-||| Property 3: ScaleTransform Reflects Element Distinctness
+||| 3. ScaleTransform Reflects Element Distinctness Homomorphism
 public export
 prop_elementScaleTransformDistinctness : Element -> Element -> Bool
 prop_elementScaleTransformDistinctness e1 e2 =
