@@ -16,4 +16,4 @@ modules = Wiki.Generators
         , Wiki.ChemistryScaleTransformSpec
 
 main = Wiki.Main
-executable = lbiochemistry-wiki
+executable = chemistry-wiki

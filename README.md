@@ -22,7 +22,7 @@
 - **[Membrane Ion Channels](Library/Wiki/Observations/MembraneIonChannel.md)** — Selective ion channel transport ($\text{Na}^+, \text{K}^+, \text{Ca}^{2+}$) across lipid bilayers.
 
 ### 3. `Library/Wiki/Main.idr`
-- **Verification Runner:** Literate Idris 2 test runner executing compile-time `%macro` reflection proofs and QuickCheck property test suites for Layer 5b (`lbiochemistry-wiki`).
+- **Verification Runner:** Literate Idris 2 test runner executing compile-time `%macro` reflection proofs and QuickCheck property test suites for Layer 5b (`chemistry-wiki`).
 
 ---
 
@@ -32,7 +32,7 @@ To compile the literate verification suite and execute the test runner binary:
 
 ```bash
 idris2 --build Idris2-Chemistry-Wiki.ipkg
-./build/exec/lbiochemistry-wiki
+./build/exec/chemistry-wiki
 ```
 
 ---
