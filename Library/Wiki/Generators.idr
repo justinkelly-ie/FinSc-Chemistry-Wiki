@@ -1,9 +1,8 @@
 module Wiki.Generators
 
 import public QuickCheck
-import Compound.MolecularBonding
-import Compound.ChemistryScaleTransforms
-import Core.BoxInt
+import Core
+import Chemistry
 
 %default total
 

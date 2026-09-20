@@ -26,11 +26,8 @@ $$\text{Codon}([b_1, b_2, b_3]) \longrightarrow \text{AminoAcidResidue}$$
 ```idris
 module Wiki.Observations.CodonTranslation
 
-import Core.BoxInt
-import Core.VexelMaxel
-import Core.UniverseState
-import Compound.Biomolecules
-import Compound.MolecularBonding
+import Core
+import Chemistry
 import Data.Vect
 
 %default total

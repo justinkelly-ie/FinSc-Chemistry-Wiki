@@ -31,9 +31,9 @@ Chemical synthesis maps atomic multisets into molecular compounds via structure-
 ```idris
 module Wiki.ChemistryScaleTransformSpec
 
-import Core.ScaleTransform
-import Compound.MolecularBonding
-import Compound.ChemistryScaleTransforms
+import Core
+import Transform
+import Chemistry
 import Wiki.Generators
 
 %default total
