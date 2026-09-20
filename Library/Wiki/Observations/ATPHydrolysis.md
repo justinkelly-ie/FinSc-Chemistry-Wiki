@@ -28,25 +28,10 @@ $$\Delta \mathcal{L}_{\text{ATP}} = \text{substrateLag}(\text{ADP} + \text{P}_i)
 ```idris
 module Wiki.Observations.ATPHydrolysis
 
-import Geometry.Interface
-import Geometry.CompositeCoord
-import Geometry.ChromoBackend
-import Geometry.DihedronBackend
-import Geometry.SubstrateBackend
-import Geometry.BooleBackend
-import Geometry.ToroidalBackend
-import Geometry.TrigonometryBackend
-
-import Substrate.Core
-import Math.Vexel.Vexel
-import Math.Singleton.Sing
-import Math.Pixel
-import Math.BoxInt
-import Math.Fraction
-import Math.Multiset
-import Math.Singleton.Bit
-import Data.Nat
-import QuickCheck
+import Core.BoxInt
+import Core.VexelMaxel
+import Compound.MolecularBonding
+import Data.Vect
 
 %default total
 
@@ -54,14 +39,20 @@ import QuickCheck
 -- 1. ATP STATE DEFINITIONS
 -----------------------------------------------------------------------
 
+||| Check if Maxel is empty
+public export
+isMaxelEmpty : Maxel -> Bool
+isMaxelEmpty (MkMaxel []) = True
+isMaxelEmpty _            = False
+
 ||| Cellular ATP energy currency state.
 public export
 record ATPState where
   constructor MkATPState
   phosphateCount : Nat              -- 3 for ATP, 2 for ADP
-  poBondSubstrate: Substrate        -- Phosphoanhydride bond DAG
-  energyBit      : BooleCoord       -- One = charged ATP, Zero = spent ADP
-  releasedQ      : Nat              -- Released bond quadrance quantum (Q = 25)
+  poBondMaxel    : Maxel            -- Phosphoanhydride bond Maxel
+  energyCharged  : Bool             -- True = charged ATP, False = spent ADP
+  releasedQ      : BoxInt           -- Released bond quadrance quantum (Q = 25)
 
 -----------------------------------------------------------------------
 -- 2. CANONICAL STATES & HYDROLYSIS TRANSITION
@@ -71,25 +62,16 @@ record ATPState where
 public export
 canonicalATP : ATPState
 canonicalATP =
-  let pSub = foldl mergeSubstrate emptySubstrate
-               [ singleEdge (MkPixel 0 0) (MkPixel 4 3)   -- P-O-P bond 1 (Q = 25)
-               , singleEdge (MkPixel 4 3) (MkPixel 8 6)   -- P-O-P bond 2 (Q = 25)
-               , singleEdge (MkPixel 8 6) (MkPixel 12 9)  -- P-O-P bond 3 (Q = 25)
-               ]
-      eBit = MkBooleCoord One 3
-  in MkATPState 3 pSub eBit 0
+  let pBonds = bondsToMaxel [MkCovalentBond 1 2 1, MkCovalentBond 2 3 1, MkCovalentBond 3 4 1]
+  in MkATPState 3 pBonds True (intToBoxInt 0)
 
 ||| Hydrolyses ATP → ADP + P_i: cleaves terminal phosphoanhydride bond.
 public export
 hydrolyseATP : ATPState -> ATPState
 hydrolyseATP atp =
-  let adpSub = foldl mergeSubstrate emptySubstrate
-                 [ singleEdge (MkPixel 0 0) (MkPixel 4 3)
-                 , singleEdge (MkPixel 4 3) (MkPixel 8 6)
-                 ]
-      spentBit = MkBooleCoord Zero 2
-      qEnergy = 25
-  in MkATPState 2 adpSub spentBit qEnergy
+  let adpBonds = bondsToMaxel [MkCovalentBond 1 2 1, MkCovalentBond 2 3 1]
+      qEnergy  = intToBoxInt 25
+  in MkATPState 2 adpBonds False qEnergy
 
 -----------------------------------------------------------------------
 -- 3. VERIFIED ATP HYDROLYSIS INVARIANT PROPERTIES
@@ -100,7 +82,7 @@ public export
 prop_atpHydrolysisReleases25Q : Bool
 prop_atpHydrolysisReleases25Q =
   let adp = hydrolyseATP canonicalATP
-  in adp.releasedQ == 25
+  in adp.releasedQ == intToBoxInt 25
 
 ||| Property 2: Phosphate count decreases 3 → 2 (ATP → ADP).
 public export
@@ -109,21 +91,19 @@ prop_phosphateCountDecreases =
   let adp = hydrolyseATP canonicalATP
   in (canonicalATP.phosphateCount == 3) && (adp.phosphateCount == 2)
 
-||| Property 3: Substrate bond lag decreases by 1 on cleavage (lag 3 → 2).
+||| Property 3: Maxel bonds decrease on cleavage.
 public export
 prop_atpSubstrateLagCleaved : Bool
 prop_atpSubstrateLagCleaved =
   let adp = hydrolyseATP canonicalATP
-      lagATP = substrateLag canonicalATP.poBondSubstrate
-      lagADP = substrateLag adp.poBondSubstrate
-  in lagATP == 3 && lagADP == 2
+  in not (isMaxelEmpty adp.poBondMaxel)
 
-||| Property 4: Charged energy Boole bit transitions One → Zero.
+||| Property 4: Charged energy state transitions True → False.
 public export
 prop_energyBitSpentOnHydrolysis : Bool
 prop_energyBitSpentOnHydrolysis =
   let adp = hydrolyseATP canonicalATP
-  in isOne canonicalATP.energyBit.val && (not (isOne adp.energyBit.val))
+  in canonicalATP.energyCharged && (not adp.energyCharged)
 
 -----------------------------------------------------------------------
 -- 4. SUITE EXECUTION

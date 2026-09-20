@@ -3,17 +3,16 @@ version = 0.1.0
 authors = "Justin Kelly"
 brief   = "Discrete Biochemistry Architecture Specification Wiki"
 
-depends = base
-        , contrib
-        , linear
-        , Idris2-Multiset-Core
-        , Idris2-Chemistry
-        , idris2-QuickCheck
-
+depends = Idris2-Chemistry, Idris2-Electromagnetism, Idris2-Multiset-Core, Idris2-Multiset-Transform, base, idris2-QuickCheck, linear
 sourcedir = "Library"
 
-modules = Wiki.Generators
-        , Wiki.ChemistryScaleTransformSpec
+modules = Wiki.ChemistryScaleTransformSpec,
+          Wiki.Generators,
+          Wiki.Main,
+          Wiki.Observations.ATPHydrolysis,
+          Wiki.Observations.CodonTranslation,
+          Wiki.Observations.EnzymeCatalysis,
+          Wiki.Observations.MembraneIonChannel
 
 main = Wiki.Main
 executable = chemistry-wiki

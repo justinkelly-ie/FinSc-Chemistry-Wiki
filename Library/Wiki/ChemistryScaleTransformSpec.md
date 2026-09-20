@@ -2,7 +2,20 @@
 
 Documents and verifies Atomic-to-Molecular scale transformations ($T_2, T_3$), atomic number ($Z$) homomorphisms, Watson-Crick base pairing hydrogen bonding laws ($A-T = 2, G-C = 3$), and molecular distinctness under Sandy Maguire's Homomorphic Observation framework using QuickCheck property testing.
 
-## 1. Mathematical Foundation & Chemical Homomorphisms
+---
+
+## 1. Discrete Molecular Structure $\leftrightarrow$ Multiset Adjacency Duality Dictionary
+
+| Chemical Structural Construct | Multiset Basis Duality | Multiset Implementation |
+| :--- | :--- | :--- |
+| **Covalent Bond Adjacency** | 2D Pixel Adjacency Matrix | `bondsToMaxel : List CovalentBond -> Maxel` |
+| **3D Molecular Spatial Conformation** | 3D Voxel Atomic Density Tensor | `Molecule3D.atoms : Boxel` |
+| **Tetrahedral Bond Angle ($\theta \sim 109.47^\circ$)** | Exact Rational Spread $s = 8/9$ | `methaneTetrahedralSpreadProof : Bool` |
+| **Octet / Duet Bond Order Saturation** | Multiset Bond Mass Conservation | `isSaturatedMolecule : Vect n Element -> List CovalentBond -> Bool` |
+
+---
+
+## 2. Mathematical Foundation & Chemical Homomorphisms
 
 Chemical synthesis maps atomic multisets into molecular compounds via structure-preserving scale transforms $\mathbf{T}_{\text{chem}} : \mathbf{ScaleLevel}_3 \to \mathbf{ScaleLevel}_4$:
 
@@ -10,6 +23,10 @@ Chemical synthesis maps atomic multisets into molecular compounds via structure-
 2. **Atomic Scale Homomorphism**: $\text{scaleTransform}(\text{Element}) \equiv \text{atomicNumber}(\text{Element})$
 3. **Element Distinctness Homomorphism**: $e_1 = e_2 \iff Z(e_1) = Z(e_2)$
 4. **Watson-Crick Hydrogen Bonding Homomorphism**: $\mathbf{H}(\text{BasePair}) \equiv 2 \cdot [A-T] + 3 \cdot [G-C]$
+
+---
+
+## 3. Formal Specification & Verification Suite
 
 ```idris
 module Wiki.ChemistryScaleTransformSpec

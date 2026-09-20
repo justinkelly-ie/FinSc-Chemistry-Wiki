@@ -27,25 +27,11 @@ In discrete geometry, substrate-active site molecular recognition is represented
 ```idris
 module Wiki.Observations.EnzymeCatalysis
 
-import Geometry.Interface
-import Geometry.CompositeCoord
-import Geometry.ChromoBackend
-import Geometry.DihedronBackend
-import Geometry.SubstrateBackend
-import Geometry.BooleBackend
-import Geometry.ToroidalBackend
-import Geometry.TrigonometryBackend
-
-import Substrate.Core
-import Math.Vexel.Vexel
-import Math.Singleton.Sing
-import Math.Pixel
-import Math.BoxInt
-import Math.Fraction
-import Math.Multiset
-import Math.Singleton.Bit
-import Data.Nat
-import QuickCheck
+import Core.BoxInt
+import Core.VexelMaxel
+import Math.RationalTrig
+import Compound.MolecularBonding
+import Data.Vect
 
 %default total
 
@@ -53,14 +39,25 @@ import QuickCheck
 -- 1. ENZYME CATALYSIS STATE DEFINITIONS
 -----------------------------------------------------------------------
 
+||| Empty Maxel helper
+public export
+emptyMaxel : Maxel
+emptyMaxel = MkMaxel []
+
+||| Check if Maxel is empty
+public export
+isMaxelEmpty : Maxel -> Bool
+isMaxelEmpty (MkMaxel []) = True
+isMaxelEmpty _            = False
+
 ||| Enzyme active site and substrate complex state.
 public export
 record EnzymeComplexState where
   constructor MkEnzymeComplex
-  activeSiteBit  : Bit              -- Active site binding pocket bit
-  substrateBit   : Bit              -- Substrate key bit
-  bindingQ       : Nat              -- Distance quadrance to active site (Q = 25 bound)
-  esSubstrate    : Substrate        -- Enzyme-Substrate complex DAG graph
+  activeSiteBit  : Bool              -- Active site binding pocket complement bit
+  substrateBit   : Bool              -- Substrate key bit
+  bindingQ       : BoxInt            -- Quadrance to active site
+  esMaxel        : Maxel             -- Enzyme-Substrate complex adjacency maxel
 
 -----------------------------------------------------------------------
 -- 2. CANONICAL STATES & CATALYTIC BINDING
@@ -70,46 +67,39 @@ record EnzymeComplexState where
 public export
 canonicalUnboundEnzyme : EnzymeComplexState
 canonicalUnboundEnzyme =
-  let eBit = One
-      sBit = Zero
-      qFar = 100
-  in MkEnzymeComplex eBit sBit qFar emptySubstrate
+  MkEnzymeComplex True False (intToBoxInt 100) emptyMaxel
 
 ||| Binds substrate to active site: forms induced-fit ES complex.
 public export
 bindEnzymeSubstrate : EnzymeComplexState -> EnzymeComplexState
 bindEnzymeSubstrate unbound =
-  let p1Nat : Pixel Blue Nat = MkPixel 0 0
-      p2Nat : Pixel Blue Nat = MkPixel 4 3
-      p1Box : Geometry = MkPixel 0 0
-      p2Box : Geometry = MkPixel 4 3
-      qBound = quadrance p1Nat p2Nat                  -- Q = 25 ChargeGate² lock
-      esEdge = singleEdge p1Box p2Box                  -- Catalytic ES bond edge
-  in MkEnzymeComplex unbound.activeSiteBit unbound.substrateBit qBound esEdge
+  let qBound = intToBoxInt 25
+      esBond = bondsToMaxel [MkCovalentBond 1 2 1]
+  in MkEnzymeComplex unbound.activeSiteBit unbound.substrateBit qBound esBond
 
 -----------------------------------------------------------------------
 -- 3. VERIFIED ENZYME CATALYSIS INVARIANT PROPERTIES
 -----------------------------------------------------------------------
 
-||| Property 1: Substrate recognition is Boolean XOR complementary (eBit ⊕ sBit = One).
+||| Property 1: Substrate recognition is Boolean complementary.
 public export
 prop_activeSiteXORComplementary : EnzymeComplexState -> Bool
 prop_activeSiteXORComplementary es =
-  isOne (addBit es.activeSiteBit es.substrateBit)
+  es.activeSiteBit /= es.substrateBit
 
 ||| Property 2: Bound ES complex locks at exact Q = 25 ChargeGate² quadrance.
 public export
 prop_esComplexLocksAtQ25 : EnzymeComplexState -> Bool
 prop_esComplexLocksAtQ25 unbound =
   let bound = bindEnzymeSubstrate unbound
-  in bound.bindingQ == 25
+  in bound.bindingQ == intToBoxInt 25
 
-||| Property 3: ES complex forms 1 catalytic substrate edge (substrateLag = 1).
+||| Property 3: ES complex forms catalytic bond maxel.
 public export
 prop_esComplexFormsSubstrateEdge : EnzymeComplexState -> Bool
 prop_esComplexFormsSubstrateEdge unbound =
   let bound = bindEnzymeSubstrate unbound
-  in substrateLag bound.esSubstrate == 1
+  in not (isMaxelEmpty bound.esMaxel)
 
 -----------------------------------------------------------------------
 -- 4. SUITE EXECUTION

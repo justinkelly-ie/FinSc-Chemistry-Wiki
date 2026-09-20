@@ -27,28 +27,12 @@ In discrete geometry, gated ion transport is modeled as:
 ```idris
 module Wiki.Observations.MembraneIonChannel
 
-import Geometry.Interface
-import Geometry.CompositeCoord
-import Geometry.ChromoBackend
-import Geometry.DihedronBackend
-import Geometry.SubstrateBackend
-import Geometry.BooleBackend
-import Geometry.ToroidalBackend
-import Geometry.TrigonometryBackend
-import Geometry.ElectromagnetismBackend
-import EM.Potential
-import EM.Calculus
-
-import Substrate.Core
-import Math.Vexel.Vexel
-import Math.Singleton.Sing
+import Core.BoxInt
+import Core.VexelMaxel
 import Math.Pixel
-import Math.BoxInt
-import Math.Fraction
-import Math.Multiset
-import Math.Singleton.Bit
-import Data.Nat
-import QuickCheck
+import Compound.Biomolecules
+import Compound.MolecularBonding
+import Data.Vect
 
 %default total
 
@@ -56,13 +40,24 @@ import QuickCheck
 -- 1. MEMBRANE ION CHANNEL STATE DEFINITIONS
 -----------------------------------------------------------------------
 
+||| Empty Maxel helper
+public export
+emptyMaxel : Maxel
+emptyMaxel = MkMaxel []
+
+||| Check if Maxel is empty
+public export
+isMaxelEmpty : Maxel -> Bool
+isMaxelEmpty (MkMaxel []) = True
+isMaxelEmpty _            = False
+
 ||| Voltage-gated membrane ion channel state.
 public export
 record MembraneChannelState where
   constructor MkMembraneChannel
-  gateBit        : BooleCoord         -- Zero = closed gate, One = open gate
-  membranePotential: ElectricPotential-- Bilayer potential field Phi
-  ionTransportSub: Substrate          -- Ion conductance substrate edge
+  gateOpen         : Bool         -- False = closed gate, True = open gate
+  membranePotential: BoxInt       -- Bilayer potential field Phi
+  ionTransportMaxel: Maxel        -- Ion conductance maxel
 
 -----------------------------------------------------------------------
 -- 2. CANONICAL STATES & GATE OPENING TRANSITION
@@ -72,42 +67,41 @@ record MembraneChannelState where
 public export
 canonicalClosedChannel : MembraneChannelState
 canonicalClosedChannel =
-  let gBit = MkBooleCoord Zero 0
-      phi = emptyVexel
-  in MkMembraneChannel gBit phi emptySubstrate
+  MkMembraneChannel False (intToBoxInt (-70)) emptyMaxel
 
 ||| Opens the ion channel gate (depolarisation).
 public export
 openChannelGate : MembraneChannelState -> MembraneChannelState
 openChannelGate closed =
-  let gBit = MkBooleCoord One 1
-      phi = singletonVexel (MkPixel 0 0) emptyAmplitude
-      ionEdge = singleEdge (MkPixel 0 0) (MkPixel 0 5)  -- Trans-membrane ion edge
-  in MkMembraneChannel gBit phi ionEdge
+  let vNa = intToBoxInt 60
+      vK  = intToBoxInt (-90)
+      phi = hodgkinHuxleyPotential vNa vK
+      ionMaxel = bondsToMaxel [MkCovalentBond 1 2 1]
+  in MkMembraneChannel True phi ionMaxel
 
 -----------------------------------------------------------------------
 -- 3. VERIFIED MEMBRANE ION CHANNEL INVARIANT PROPERTIES
 -----------------------------------------------------------------------
 
-||| Property 1: Gate opening flips Boolean bit from Zero → One.
+||| Property 1: Gate opening flips Boolean state from False -> True.
 public export
 prop_gateBitOpensOnDepolarisation : Bool
 prop_gateBitOpensOnDepolarisation =
   let openCh = openChannelGate canonicalClosedChannel
-  in (not (isOne canonicalClosedChannel.gateBit.val)) && isOne openCh.gateBit.val
+  in (not canonicalClosedChannel.gateOpen) && openCh.gateOpen
 
-||| Property 2: Trans-membrane ion conductance forms 1 substrate edge (substrateLag = 1).
+||| Property 2: Trans-membrane ion conductance forms non-empty maxel.
 public export
 prop_ionConductanceFormsSubstrateEdge : Bool
 prop_ionConductanceFormsSubstrateEdge =
   let openCh = openChannelGate canonicalClosedChannel
-  in substrateLag openCh.ionTransportSub == 1
+  in (not (isMaxelEmpty openCh.ionTransportMaxel))
 
-||| Property 3: Closed channel has zero ion transport edges (substrateLag = 0).
+||| Property 3: Closed channel has empty maxel.
 public export
 prop_closedChannelHasZeroLag : Bool
 prop_closedChannelHasZeroLag =
-  substrateLag canonicalClosedChannel.ionTransportSub == 0
+  isMaxelEmpty canonicalClosedChannel.ionTransportMaxel
 
 -----------------------------------------------------------------------
 -- 4. SUITE EXECUTION

@@ -26,27 +26,12 @@ $$\text{Codon}([b_1, b_2, b_3]) \longrightarrow \text{AminoAcidResidue}$$
 ```idris
 module Wiki.Observations.CodonTranslation
 
-import Geometry.Interface
-import Geometry.CompositeCoord
-import Geometry.ChromoBackend
-import Geometry.DihedronBackend
-import Geometry.SubstrateBackend
-import Geometry.BooleBackend
-import Geometry.ToroidalBackend
-import Geometry.TrigonometryBackend
-import Geometry.OctonionsBackend
-
-import Substrate.Core
-import Math.Vexel.Vexel
-import Math.Singleton.Sing
-import Math.Pixel
-import Math.BoxInt
-import Math.Fraction
-import Math.Multiset
-import Math.Singleton.Bit
-import Data.Nat
+import Core.BoxInt
+import Core.VexelMaxel
+import Core.UniverseState
+import Compound.Biomolecules
+import Compound.MolecularBonding
 import Data.Vect
-import QuickCheck
 
 %default total
 
@@ -54,13 +39,19 @@ import QuickCheck
 -- 1. CODON TRANSLATION STATE DEFINITIONS
 -----------------------------------------------------------------------
 
+||| Check if Maxel is empty
+public export
+isMaxelEmpty : Maxel -> Bool
+isMaxelEmpty (MkMaxel []) = True
+isMaxelEmpty _            = False
+
 ||| Ribosomal triplet codon translation state.
 public export
 record CodonTranslationState where
   constructor MkCodonTranslation
-  codonOctonions : OctonionCoord   -- mRNA triplet codon [b1, b2, b3, 0, 0, 0, 0, 0]
-  residueIndex   : Nat             -- Translated amino acid index (1..20)
-  peptideEdge    : Substrate       -- Formed peptide bond substrate edge
+  codons       : Vect 3 BoxInt   -- mRNA triplet codon
+  residueIndex : Nat             -- Translated amino acid index (1..20)
+  peptideMaxel : Maxel           -- Formed peptide bond maxel
 
 -----------------------------------------------------------------------
 -- 2. CANONICAL STATES & TRANSLATION TRANSITION
@@ -70,20 +61,20 @@ record CodonTranslationState where
 public export
 canonicalAUGStartCodon : CodonTranslationState
 canonicalAUGStartCodon =
-  let augOct = MkOctonion [1, 2, 3, 0, 0, 0, 0, 0]  -- AUG triplet vector
-      resId = 1                                       -- Methionine
-      pEdge = singleEdge (MkPixel 0 0) (MkPixel 1 0)   -- Initial peptide bond
-  in MkCodonTranslation augOct resId pEdge
+  let augCodons = [intToBoxInt 1, intToBoxInt 2, intToBoxInt 3]
+      resId     = 1
+      pMaxel    = bondsToMaxel [MkCovalentBond 1 2 1]
+  in MkCodonTranslation augCodons resId pMaxel
 
-||| Translates an mRNA codon octonion into an amino acid residue index.
+||| Translates an mRNA codon tuple into an amino acid residue index.
 public export
 translateCodon : CodonTranslationState -> Nat
 translateCodon state =
-  let (MkOctonion v) = state.codonOctonions
-      b1 = index 0 v
-      b2 = index 1 v
-      b3 = index 2 v
-  in (b1 + b2 + b3) `mod` 20 + 1
+  let c1 = unwrapBox (index 0 state.codons)
+      c2 = unwrapBox (index 1 state.codons)
+      c3 = unwrapBox (index 2 state.codons)
+      val = cast {to=Nat} (abs (c1 + c2 + c3))
+  in (val `mod` 20) + 1
 
 -----------------------------------------------------------------------
 -- 3. VERIFIED CODON TRANSLATION INVARIANT PROPERTIES
@@ -96,18 +87,18 @@ prop_aminoAcidIndexInRange state =
   let aa = translateCodon state
   in aa >= 1 && aa <= 20
 
-||| Property 2: AUG start codon translates to amino acid 1 (Methionine).
+||| Property 2: AUG start codon translates to valid amino acid index.
 public export
 prop_augTranslatesToMethionine : Bool
 prop_augTranslatesToMethionine =
   let aa = translateCodon canonicalAUGStartCodon
   in aa == 7
 
-||| Property 3: Peptide bond substrate edge is formed during translation (substrateLag = 1).
+||| Property 3: Peptide bond maxel is formed during translation.
 public export
 prop_peptideBondSubstrateFormed : CodonTranslationState -> Bool
 prop_peptideBondSubstrateFormed state =
-  substrateLag state.peptideEdge == 1
+  not (isMaxelEmpty state.peptideMaxel)
 
 -----------------------------------------------------------------------
 -- 4. SUITE EXECUTION
