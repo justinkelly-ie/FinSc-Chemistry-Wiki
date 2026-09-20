@@ -21,11 +21,3 @@ Arbitrary Element where
   coarbitrary Carbon   gen = coarbitrary (the Nat 1) gen
   coarbitrary Nitrogen gen = coarbitrary (the Nat 2) gen
   coarbitrary Oxygen   gen = coarbitrary (the Nat 3) gen
-
-public export
-qc : (Arbitrary a, Show a, Testable prop) => (a -> prop) -> QCRes
-qc f = quickCheck (MkFn f)
-
-public export
-qc2 : (Arbitrary a, Show a, Arbitrary b, Show b, Testable prop) => (a -> b -> prop) -> QCRes
-qc2 f = quickCheck (MkFn (\x => MkFn (f x)))
