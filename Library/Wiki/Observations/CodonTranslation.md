@@ -38,7 +38,7 @@ import Data.Vect
 
 ||| Check if Maxel is empty
 public export
-isMaxelEmpty : Maxel -> Bool
+isMaxelEmpty : Core.VexelMaxel.Maxel -> Bool
 isMaxelEmpty (MkMaxel []) = True
 isMaxelEmpty _            = False
 
@@ -48,7 +48,7 @@ record CodonTranslationState where
   constructor MkCodonTranslation
   codons       : Vect 3 BoxInt   -- mRNA triplet codon
   residueIndex : Nat             -- Translated amino acid index (1..20)
-  peptideMaxel : Maxel           -- Formed peptide bond maxel
+  peptideMaxel : Core.VexelMaxel.Maxel           -- Formed peptide bond maxel
 
 -----------------------------------------------------------------------
 -- 2. CANONICAL STATES & TRANSLATION TRANSITION
