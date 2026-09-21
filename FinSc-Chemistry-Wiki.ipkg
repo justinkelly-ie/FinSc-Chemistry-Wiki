@@ -1,9 +1,9 @@
-package Idris2-Chemistry-Wiki
+package FinSc-Chemistry-Wiki
 version = 0.1.0
 authors = "Justin Kelly"
 brief   = "Discrete Biochemistry Architecture Specification Wiki"
 
-depends = Idris2-Chemistry, Idris2-Electromagnetism, Idris2-Multiset-Core, Idris2-Multiset-Transform, base, idris2-QuickCheck, linear
+depends = FinSc-Chemistry, FinSc-Electromagnetism, FinSc-Multiset-Core, FinSc-Multiset-Transform, base, idris2-QuickCheck, linear
 sourcedir = "Library"
 
 modules = Wiki.ChemistryScaleTransformSpec,
