@@ -34,7 +34,7 @@ module Wiki.ChemistryScaleTransformSpec
 import Core
 import Transform
 import Chemistry
-import Math.OnSeq.FusedStream
+import Stage0.OnSeq.FusedStream
 import Data.Fuel
 import Wiki.Generators
 

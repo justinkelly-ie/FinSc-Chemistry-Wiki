@@ -40,12 +40,12 @@ import Data.Vect
 
 ||| Empty Maxel helper
 public export
-emptyMaxel : Core.VexelMaxel.Maxel
+emptyMaxel : Stage1.VexelMaxel.Maxel
 emptyMaxel = MkMaxel []
 
 ||| Check if Maxel is empty
 public export
-isMaxelEmpty : Core.VexelMaxel.Maxel -> Bool
+isMaxelEmpty : Stage1.VexelMaxel.Maxel -> Bool
 isMaxelEmpty (MkMaxel []) = True
 isMaxelEmpty _            = False
 
@@ -55,7 +55,7 @@ record MembraneChannelState where
   constructor MkMembraneChannel
   gateOpen         : Bool         -- False = closed gate, True = open gate
   membranePotential: BoxInt       -- Bilayer potential field Phi
-  ionTransportMaxel: Core.VexelMaxel.Maxel        -- Ion conductance maxel
+  ionTransportMaxel: Stage1.VexelMaxel.Maxel        -- Ion conductance maxel
 
 -----------------------------------------------------------------------
 -- 2. CANONICAL STATES & GATE OPENING TRANSITION

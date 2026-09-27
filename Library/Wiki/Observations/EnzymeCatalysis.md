@@ -27,10 +27,10 @@ In discrete geometry, substrate-active site molecular recognition is represented
 ```idris
 module Wiki.Observations.EnzymeCatalysis
 
-import Core.BoxInt
-import Core.VexelMaxel
-import Math.RationalTrig
-import Compound.MolecularBonding
+import Stage0.BoxInt
+import Stage1.VexelMaxel
+import Stage1.RationalTrig
+import Stage1.Chemistry.MolecularBonding
 import Data.Vect
 
 %default total

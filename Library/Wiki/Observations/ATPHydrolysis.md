@@ -28,9 +28,9 @@ $$\Delta \mathcal{L}_{\text{ATP}} = \text{substrateLag}(\text{ADP} + \text{P}_i)
 ```idris
 module Wiki.Observations.ATPHydrolysis
 
-import Core.BoxInt
-import Core.VexelMaxel
-import Compound.MolecularBonding
+import Stage0.BoxInt
+import Stage1.VexelMaxel
+import Stage1.Chemistry.MolecularBonding
 import Data.Vect
 
 %default total
