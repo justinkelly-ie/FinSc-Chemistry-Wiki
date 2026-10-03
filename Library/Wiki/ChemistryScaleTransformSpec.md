@@ -32,7 +32,7 @@ Chemical synthesis maps atomic multisets into molecular compounds via structure-
 module Wiki.ChemistryScaleTransformSpec
 
 import Core
-import Transform
+import PhaseUnfolding
 import Chemistry
 import Stage0.OnSeq.FusedStream
 import Data.Fuel
