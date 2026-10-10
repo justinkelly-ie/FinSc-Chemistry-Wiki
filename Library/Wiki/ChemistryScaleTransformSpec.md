@@ -58,17 +58,11 @@ record VerifiedMolecularState where
   valenceElectronsOut : Nat
   0 valencePrf        : ValenceElectronConservationWitness valenceElectronsIn valenceElectronsOut
 
-||| $O(1)$ allocation deforested molecular bond energy stream transducer using fusedHylomorphism
-public export covering
+||| $O(1)$ allocation deforested molecular bond energy stream transducer using foldStreamNat
+public export
 fusedMolecularBondEnergyStream : Fuel -> List (Nat, Nat) -> Nat
-fusedMolecularBondEnergyStream f items =
-  fusedHylomorphism f
-    (\st => case st of
-              [] => Done
-              (e, b) :: rest => Yield (e + b) rest)
-    (\val, acc => val + acc)
-    0
-    items
+fusedMolecularBondEnergyStream _ items =
+  foldStreamNat (length items) (\acc, (e, b) => acc + e + b) 0 (stream items)
 
 ||| 1. Element ScaleTransform Atomic Number Positivity (Z > 0)
 public export
