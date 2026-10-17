@@ -35,6 +35,7 @@ import Core
 import PhaseUnfolding
 import Chemistry
 import Stage0.OnSeq.FusedStream
+import Stage0.StructuralFuel
 import Data.Fuel
 import Wiki.Generators
 
@@ -60,9 +61,9 @@ record VerifiedMolecularState where
 
 ||| $O(1)$ allocation deforested molecular bond energy stream transducer using foldStreamNat
 public export
-fusedMolecularBondEnergyStream : Fuel -> List (Nat, Nat) -> Nat
-fusedMolecularBondEnergyStream _ items =
-  foldStreamNat (length items) (\acc, (e, b) => acc + e + b) 0 (stream items)
+fusedMolecularBondEnergyStream : GohFuel cap -> List (Nat, Nat) -> Nat
+fusedMolecularBondEnergyStream fuel items =
+  foldStreamNat (gohSteps fuel) (\acc, (e, b) => acc + e + b) 0 (stream items)
 
 ||| 1. Element ScaleTransform Atomic Number Positivity (Z > 0)
 public export
@@ -99,6 +100,6 @@ auditChemistryScaleTransformSpecProof = do
   let r1 = qc prop_elementAtomicNumberPositivity
   let r2 = qc prop_elementScaleTransformMatch
   let r3 = qc2 prop_elementScaleTransformDistinctness
-  let streamSum = fusedMolecularBondEnergyStream (limit 100) [(8, 8), (2, 2)]
+  let streamSum = fusedMolecularBondEnergyStream ellipticGohFuelModel [(8, 8), (2, 2)]
   pure (r1.pass == Just True && r2.pass == Just True && r3.pass == Just True && streamSum == 20)
 ```
