@@ -47,8 +47,9 @@ emptyMaxel = MkMaxel []
 ||| Check if Maxel is empty
 public export
 isMaxelEmpty : Maxel -> Bool
-isMaxelEmpty (MkMaxel []) = True
-isMaxelEmpty _            = False
+isMaxelEmpty m = case pixels m of
+  [] => True
+  _  => False
 
 ||| Enzyme active site and substrate complex state.
 public export

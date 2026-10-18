@@ -46,8 +46,9 @@ emptyMaxel = MkMaxel []
 ||| Check if Maxel is empty
 public export
 isMaxelEmpty : Stage1.VexelMaxel.Maxel -> Bool
-isMaxelEmpty (MkMaxel []) = True
-isMaxelEmpty _            = False
+isMaxelEmpty m = case pixels m of
+  [] => True
+  _  => False
 
 ||| Voltage-gated membrane ion channel state.
 public export

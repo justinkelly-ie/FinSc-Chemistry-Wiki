@@ -42,8 +42,9 @@ import Data.Vect
 ||| Check if Maxel is empty
 public export
 isMaxelEmpty : Maxel -> Bool
-isMaxelEmpty (MkMaxel []) = True
-isMaxelEmpty _            = False
+isMaxelEmpty m = case pixels m of
+  [] => True
+  _  => False
 
 ||| Cellular ATP energy currency state.
 public export
