@@ -28,7 +28,7 @@ In discrete geometry, substrate-active site molecular recognition is represented
 module Wiki.Observations.EnzymeCatalysis
 
 import Stage0.BoxInt
-import Stage1.VexelMaxel
+import Stage1.Carrier.Maxel
 import Stage1.RationalTrig
 import Stage1.Chemistry.MolecularBonding
 import Data.Vect
@@ -38,11 +38,6 @@ import Data.Vect
 -----------------------------------------------------------------------
 -- 1. ENZYME CATALYSIS STATE DEFINITIONS
 -----------------------------------------------------------------------
-
-||| Empty Maxel helper
-public export
-emptyMaxel : Maxel
-emptyMaxel = MkMaxel []
 
 ||| Check if Maxel is empty
 public export
