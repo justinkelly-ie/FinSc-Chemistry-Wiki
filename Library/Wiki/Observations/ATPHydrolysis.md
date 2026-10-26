@@ -29,7 +29,7 @@ $$\Delta \mathcal{L}_{\text{ATP}} = \text{substrateLag}(\text{ADP} + \text{P}_i)
 module Wiki.Observations.ATPHydrolysis
 
 import Stage0.BoxInt
-import Stage1.Carrier.Maxel
+import Stage1.Basis.Coordinate
 import Stage1.Chemistry.MolecularBonding
 import Data.Vect
 
