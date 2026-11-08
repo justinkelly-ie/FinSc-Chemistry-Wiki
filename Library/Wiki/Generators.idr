@@ -12,7 +12,8 @@ natToElement 0 = Hydrogen
 natToElement 1 = Carbon
 natToElement 2 = Nitrogen
 natToElement 3 = Oxygen
-natToElement _ = Phosphorus
+natToElement 4 = Phosphorus
+natToElement _ = Sulfur
 
 public export
 Arbitrary Element where
@@ -23,3 +24,4 @@ Arbitrary Element where
   coarbitrary Nitrogen   gen = coarbitrary (the Nat 2) gen
   coarbitrary Oxygen     gen = coarbitrary (the Nat 3) gen
   coarbitrary Phosphorus gen = coarbitrary (the Nat 4) gen
+  coarbitrary Sulfur     gen = coarbitrary (the Nat 5) gen
