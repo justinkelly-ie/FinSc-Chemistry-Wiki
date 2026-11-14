@@ -1,7 +1,7 @@
 module Wiki.Generators
 
 import public QuickCheck
-import Core
+import MetricSubstrate
 import Chemistry
 
 %default total

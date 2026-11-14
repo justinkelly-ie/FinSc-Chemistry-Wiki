@@ -27,7 +27,7 @@ In discrete geometry, gated ion transport is modeled as:
 ```idris
 module Wiki.Observations.MembraneIonChannel
 
-import Core
+import MetricSubstrate
 import Geometry
 import Chemistry
 import Data.Vect

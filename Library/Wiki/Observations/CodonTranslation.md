@@ -26,7 +26,7 @@ $$\text{Codon}([b_1, b_2, b_3]) \longrightarrow \text{AminoAcidResidue}$$
 ```idris
 module Wiki.Observations.CodonTranslation
 
-import Core
+import MetricSubstrate
 import Chemistry
 import Data.Vect
 
